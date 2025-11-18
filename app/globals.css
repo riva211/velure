@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* Tailwind v4: define design tokens in @theme so utilities are generated */
+@theme {
+  /* Custom animations */
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  /* Custom Color Palette (enables bg-parchment-500, text-seashell-700, etc.) */
+  --color-parchment-50: #f6f3ee;
+  --color-parchment-100: #ede6de;
+  --color-parchment-200: #dbcebd;
+  --color-parchment-300: #c9b59c;
+  --color-parchment-400: #b89c7a;
+  --color-parchment-500: #a68359;
+  --color-parchment-600: #856947;
+  --color-parchment-700: #634f36;
+  --color-parchment-800: #423524;
+  --color-parchment-900: #211a12;
+  --color-parchment-950: #17120c;
+
+  --color-dim-grey-50: #f3f2f1;
+  --color-dim-grey-100: #e8e5e3;
+  --color-dim-grey-200: #d0cbc8;
+  --color-dim-grey-300: #b9b2ac;
+  --color-dim-grey-400: #a19891;
+  --color-dim-grey-500: #8a7e75;
+  --color-dim-grey-600: #6e655e;
+  --color-dim-grey-700: #534c46;
+  --color-dim-grey-800: #37322f;
+  --color-dim-grey-900: #1c1917;
+  --color-dim-grey-950: #131210;
+
+  --color-dark-coffee-50: #f5f2ef;
+  --color-dark-coffee-100: #ece4df;
+  --color-dark-coffee-200: #d8cac0;
+  --color-dark-coffee-300: #c5afa0;
+  --color-dark-coffee-400: #b19581;
+  --color-dark-coffee-500: #9e7a61;
+  --color-dark-coffee-600: #7e624e;
+  --color-dark-coffee-700: #5f493a;
+  --color-dark-coffee-800: #3f3127;
+  --color-dark-coffee-900: #201813;
+  --color-dark-coffee-950: #16110e;
+
+  --color-khaki-beige-50: #f4f2f1;
+  --color-khaki-beige-100: #e8e6e3;
+  --color-khaki-beige-200: #d2cdc6;
+  --color-khaki-beige-300: #bbb4aa;
+  --color-khaki-beige-400: #a49b8e;
+  --color-khaki-beige-500: #8e8271;
+  --color-khaki-beige-600: #71685b;
+  --color-khaki-beige-700: #554e44;
+  --color-khaki-beige-800: #39342d;
+  --color-khaki-beige-900: #1c1a17;
+  --color-khaki-beige-950: #141210;
+
+  --color-seashell-50: #f8f0ec;
+  --color-seashell-100: #f1e2da;
+  --color-seashell-200: #e4c5b4;
+  --color-seashell-300: #d6a88f;
+  --color-seashell-400: #c98b69;
+  --color-seashell-500: #bb6e44;
+  --color-seashell-600: #965836;
+  --color-seashell-700: #704229;
+  --color-seashell-800: #4b2c1b;
+  --color-seashell-900: #25160e;
+  --color-seashell-950: #1a0f09;
+
+  /* Semantic theme colors (use classes like bg-background, text-foreground, etc.) */
+  --color-background: 0 0% 100%;
+  --color-foreground: 222.2 84% 4.9%;
+  --color-card: 0 0% 100%;
+  --color-card-foreground: 222.2 84% 4.9%;
+  --color-popover: 0 0% 100%;
+  --color-popover-foreground: 222.2 84% 4.9%;
+  --color-primary: 222.2 47.4% 11.2%;
+  --color-primary-foreground: 210 40% 98%;
+  --color-secondary: 210 40% 96.1%;
+  --color-secondary-foreground: 222.2 47.4% 11.2%;
+  --color-muted: 210 40% 96.1%;
+  --color-muted-foreground: 215.4 16.3% 46.9%;
+  --color-accent: 210 40% 96.1%;
+  --color-accent-foreground: 222.2 47.4% 11.2%;
+  --color-destructive: 0 84.2% 60.2%;
+  --color-destructive-foreground: 210 40% 98%;
+  --color-border: 214.3 31.8% 91.4%;
+  --color-input: 214.3 31.8% 91.4%;
+  --color-ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-background: 222.2 84% 4.9%;
+  --color-foreground: 210 40% 98%;
+  --color-card: 222.2 84% 4.9%;
+  --color-card-foreground: 210 40% 98%;
+  --color-popover: 222.2 84% 4.9%;
+  --color-popover-foreground: 210 40% 98%;
+  --color-primary: 210 40% 98%;
+  --color-primary-foreground: 222.2 47.4% 11.2%;
+  --color-secondary: 217.2 32.6% 17.5%;
+  --color-secondary-foreground: 210 40% 98%;
+  --color-muted: 217.2 32.6% 17.5%;
+  --color-muted-foreground: 215 20.2% 65.1%;
+  --color-accent: 217.2 32.6% 17.5%;
+  --color-accent-foreground: 210 40% 98%;
+  --color-destructive: 0 62.8% 30.6%;
+  --color-destructive-foreground: 210 40% 98%;
+  --color-border: 217.2 32.6% 17.5%;
+  --color-input: 217.2 32.6% 17.5%;
+  --color-ring: 212.7 26.8% 83.9%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+}
+
+@layer base {
+  * { border-color: hsl(var(--color-border)); }
+  body {
+    background-color: hsl(var(--color-background));
+    color: hsl(var(--color-foreground));
+  }
+}
+
+/* Tailwind v4 plugin usage */
+@plugin "tailwindcss-animate";
