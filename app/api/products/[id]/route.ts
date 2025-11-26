@@ -24,7 +24,7 @@ export async function GET(
     console.log("Fetching product with ID:", id);
     const product = await Product.findById(id).lean();
 
-    if (!product) {
+    if (!product || Array.isArray(product)) {
       console.log("Product not found for ID:", id);
       return NextResponse.json(
         { error: "Product not found" },
@@ -35,10 +35,10 @@ export async function GET(
     // Transform MongoDB document to plain object with string ID
     const transformedProduct = {
       ...product,
-      _id: product._id.toString(),
+      _id: (product._id as mongoose.Types.ObjectId).toString(),
     };
 
-    console.log("Product found:", transformedProduct.name);
+    console.log("Product found:", (product as any).name);
     return NextResponse.json({ product: transformedProduct });
   } catch (error) {
     console.error("Error fetching product:", error);

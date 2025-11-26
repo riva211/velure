@@ -18,7 +18,7 @@ async function getFeaturedProducts() {
       .lean();
 
     // Convert MongoDB documents to plain objects with string IDs
-    return products.map((product) => ({
+    return products.map((product: any) => ({
       ...product,
       _id: product._id.toString(),
     }));
