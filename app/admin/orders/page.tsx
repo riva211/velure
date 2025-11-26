@@ -28,12 +28,32 @@ import { Search, Eye } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface Order {
+  _id: string;
+  orderId: string;
+  customer: {
+    name: string;
+    email: string;
+  };
+  items: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+  shippingAddress?: any;
+}
+
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   // Fetch orders from API
   useEffect(() => {
