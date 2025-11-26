@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DollarSign,
@@ -8,43 +9,47 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
-
-// Mock data
-const stats = {
-  revenue: 45231.89,
-  orders: 234,
-  products: 156,
-  customers: 1243,
-};
-
-const recentOrders = [
-  {
-    id: "1",
-    customer: "John Doe",
-    email: "john@example.com",
-    total: 299.99,
-    status: "pending",
-    date: "2024-01-15",
-  },
-  {
-    id: "2",
-    customer: "Jane Smith",
-    email: "jane@example.com",
-    total: 499.99,
-    status: "processing",
-    date: "2024-01-15",
-  },
-  {
-    id: "3",
-    customer: "Bob Johnson",
-    email: "bob@example.com",
-    total: 199.99,
-    status: "shipped",
-    date: "2024-01-14",
-  },
-];
+import { formatPrice } from "@/lib/utils";
 
 export default function AdminDashboardPage() {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const [ordersRes, productsRes] = await Promise.all([
+        fetch("/api/orders"),
+        fetch("/api/products"),
+      ]);
+
+      const ordersData = await ordersRes.json();
+      const productsData = await productsRes.json();
+
+      setOrders(ordersData.orders || []);
+      setProducts(productsData.products || []);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Calculate stats from real data
+  const stats = {
+    revenue: orders.reduce((sum, order) => sum + order.totalPrice, 0),
+    orders: orders.length,
+    products: products.length,
+    customers: new Set(orders.map(o => o.customer?.email)).size,
+  };
+
+  // Get recent orders (last 5)
+  const recentOrders = orders.slice(0, 5);
   return (
     <div className="space-y-6">
       <div>
@@ -63,13 +68,10 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${stats.revenue.toLocaleString()}
+              {formatPrice(stats.revenue)}
             </div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
-                +20.1% from last month
-              </span>
+              Total revenue from all orders
             </p>
           </CardContent>
         </Card>
@@ -80,12 +82,9 @@ export default function AdminDashboardPage() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{stats.orders}</div>
+            <div className="text-2xl font-bold">{stats.orders}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
-                +15% from last month
-              </span>
+              Total orders placed
             </p>
           </CardContent>
         </Card>
@@ -111,10 +110,7 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.customers}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
-                +10% from last month
-              </span>
+              Unique customers
             </p>
           </CardContent>
         </Card>
@@ -126,36 +122,50 @@ export default function AdminDashboardPage() {
           <CardTitle>Recent Orders</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="space-y-1">
-                  <p className="font-medium">{order.customer}</p>
-                  <p className="text-sm text-muted-foreground">{order.email}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Order #{order.id} • {order.date}
-                  </p>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : recentOrders.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No orders yet. Orders will appear here when customers make purchases.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recentOrders.map((order) => (
+                <div
+                  key={order._id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="space-y-1">
+                    <p className="font-medium">{order.customer.name}</p>
+                    <p className="text-sm text-muted-foreground">{order.customer.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {order.orderId} • {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4 mt-2 sm:mt-0">
+                    <span className="font-semibold">{formatPrice(order.totalPrice)}</span>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        order.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : order.status === "processing"
+                          ? "bg-blue-100 text-blue-800"
+                          : order.status === "shipped"
+                          ? "bg-purple-100 text-purple-800"
+                          : order.status === "delivered"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                  <span className="font-semibold">${order.total}</span>
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      order.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : order.status === "processing"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

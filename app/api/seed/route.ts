@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Product } from "@/lib/models/Product";
+import { User } from "@/lib/models/User";
 import { dummyProducts } from "@/lib/dummy-data";
+import bcrypt from "bcryptjs";
 
 export async function POST() {
   try {
@@ -25,10 +27,30 @@ export async function POST() {
       }))
     );
 
+    // Create admin user if it doesn't exist
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@velure.com";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+    let adminUser = await User.findOne({ email: adminEmail });
+
+    if (!adminUser) {
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      adminUser = await User.create({
+        name: "Admin",
+        email: adminEmail,
+        password: hashedPassword,
+        role: "admin",
+      });
+    }
+
     return NextResponse.json({
       message: "Database seeded successfully",
       count: products.length,
       products: products.map((p) => ({ id: p._id, name: p.name })),
+      admin: {
+        message: "Admin user created/verified",
+        email: adminEmail,
+      },
     });
   } catch (error) {
     console.error("Error seeding database:", error);

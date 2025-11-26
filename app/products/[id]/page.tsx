@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -28,62 +29,92 @@ import {
   Shield,
   RefreshCw,
 } from "lucide-react";
-
-// Mock product data
-const productData = {
-  _id: "1",
-  name: "Premium Wireless Headphones",
-  description:
-    "Experience superior sound quality with our premium wireless headphones. Featuring advanced active noise cancellation technology, these headphones deliver an immersive audio experience perfect for music lovers and professionals alike.",
-  price: 299.99,
-  category: "Electronics",
-  images: [
-    "/placeholder-product.jpg",
-    "/placeholder-product.jpg",
-    "/placeholder-product.jpg",
-  ],
-  stock: 15,
-  averageRating: 4.5,
-  numReviews: 124,
-  features: [
-    "Active Noise Cancellation",
-    "40-hour battery life",
-    "Premium sound quality",
-    "Comfortable over-ear design",
-    "Bluetooth 5.0 connectivity",
-  ],
-  reviews: [
-    {
-      _id: "1",
-      userName: "John Doe",
-      rating: 5,
-      comment: "Amazing sound quality! Worth every penny.",
-      createdAt: new Date("2024-01-15"),
-    },
-    {
-      _id: "2",
-      userName: "Jane Smith",
-      rating: 4,
-      comment: "Great headphones, but a bit pricey.",
-      createdAt: new Date("2024-01-10"),
-    },
-  ],
-};
+import { toast } from "sonner";
 
 export default function ProductDetailPage() {
   const params = useParams();
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [product, setProduct] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
 
-  const handleAddToCart = () => {
-    console.log("Add to cart:", productData._id, quantity);
+  // Fetch product from API
+  useEffect(() => {
+    if (params.id) {
+      fetchProduct();
+    }
+  }, [params.id]);
+
+  const fetchProduct = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/products/${params.id}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setProduct(data.product);
+      } else {
+        toast.error("Product not found");
+        router.push("/products");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Failed to load product");
+      router.push("/products");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!session?.user) {
+      toast.error("Please login to add items to cart");
+      router.push("/login");
+      return;
+    }
+
+    if (!product) return;
+
+    try {
+      setIsAddingToCart(true);
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: product._id,
+          quantity: quantity,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.error || "Failed to add to cart");
+        return;
+      }
+
+      toast.success("Product added to cart!");
+
+      // Trigger cart update event
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add to cart");
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleQuantityChange = (delta: number) => {
+    if (!product) return;
     const newQuantity = quantity + delta;
-    if (newQuantity >= 1 && newQuantity <= productData.stock) {
+    if (newQuantity >= 1 && newQuantity <= product.stock) {
       setQuantity(newQuantity);
     }
   };
@@ -93,6 +124,23 @@ export default function ProductDetailPage() {
     console.log("Submit review:", newReview);
     setNewReview({ rating: 5, comment: "" });
   };
+
+  // Show loading state
+  if (isLoading || !product) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -104,15 +152,15 @@ export default function ProductDetailPage() {
             <div className="space-y-4">
               <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
                 <Image
-                  src={productData.images[selectedImage]}
-                  alt={productData.name}
+                  src={product.images[selectedImage]}
+                  alt={product.name}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
               <div className="grid grid-cols-3 gap-4">
-                {productData.images.map((image, index) => (
+                {product.images.slice(0, 3).map((image: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
@@ -124,7 +172,7 @@ export default function ProductDetailPage() {
                   >
                     <Image
                       src={image}
-                      alt={`${productData.name} ${index + 1}`}
+                      alt={`${product.name} ${index + 1}`}
                       fill
                       className="object-cover"
                       sizes="150px"
@@ -137,9 +185,9 @@ export default function ProductDetailPage() {
             {/* Product Info */}
             <div className="space-y-6">
               <div>
-                <Badge className="mb-2">{productData.category}</Badge>
+                <Badge className="mb-2">{product.category}</Badge>
                 <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                  {productData.name}
+                  {product.name}
                 </h1>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center">
@@ -147,7 +195,7 @@ export default function ProductDetailPage() {
                       <Star
                         key={i}
                         className={`h-5 w-5 ${
-                          i < Math.floor(productData.averageRating)
+                          i < Math.floor(product.averageRating)
                             ? "fill-yellow-400 text-yellow-400"
                             : "fill-muted text-muted"
                         }`}
@@ -155,22 +203,22 @@ export default function ProductDetailPage() {
                     ))}
                   </div>
                   <span className="text-muted-foreground">
-                    {productData.averageRating} ({productData.numReviews}{" "}
+                    {product.averageRating} ({product.numReviews}{" "}
                     reviews)
                   </span>
                 </div>
                 <p className="text-3xl font-bold">
-                  {formatPrice(productData.price)}
+                  {formatPrice(product.price)}
                 </p>
               </div>
 
-              <p className="text-muted-foreground">{productData.description}</p>
+              <p className="text-muted-foreground">{product.description}</p>
 
               {/* Stock Status */}
               <div>
-                {productData.stock > 0 ? (
+                {product.stock > 0 ? (
                   <Badge variant="outline" className="text-green-600">
-                    In Stock ({productData.stock} available)
+                    In Stock ({product.stock} available)
                   </Badge>
                 ) : (
                   <Badge variant="destructive">Out of Stock</Badge>
@@ -197,7 +245,7 @@ export default function ProductDetailPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleQuantityChange(1)}
-                      disabled={quantity >= productData.stock}
+                      disabled={quantity >= product.stock}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -206,10 +254,10 @@ export default function ProductDetailPage() {
                     size="lg"
                     className="flex-1"
                     onClick={handleAddToCart}
-                    disabled={productData.stock === 0}
+                    disabled={product.stock === 0 || isAddingToCart}
                   >
                     <ShoppingCart className="mr-2 h-5 w-5" />
-                    Add to Cart
+                    {isAddingToCart ? "Adding..." : "Add to Cart"}
                   </Button>
                   <Button
                     size="lg"
@@ -224,18 +272,22 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              {/* Features */}
-              <div className="border-t pt-6">
-                <h3 className="font-semibold mb-3">Key Features</h3>
-                <ul className="space-y-2">
-                  {productData.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
+              {/* Metal Info */}
+              {product.metal && (
+                <div className="border-t pt-6">
+                  <h3 className="font-semibold mb-3">Product Details</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
                       <span className="text-primary mt-1">•</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                      <span>Metal: {product.metal}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-primary mt-1">•</span>
+                      <span>Category: {product.category}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Benefits */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-6">
@@ -259,7 +311,7 @@ export default function ProductDetailPage() {
           <Tabs defaultValue="reviews" className="w-full">
             <TabsList className="w-full justify-start">
               <TabsTrigger value="reviews">
-                Reviews ({productData.numReviews})
+                Reviews ({product.reviews?.length || 0})
               </TabsTrigger>
               <TabsTrigger value="specifications">Specifications</TabsTrigger>
             </TabsList>
@@ -307,33 +359,39 @@ export default function ProductDetailPage() {
 
               {/* Existing Reviews */}
               <div className="space-y-4">
-                {productData.reviews.map((review) => (
-                  <div key={review._id} className="border rounded-lg p-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="font-semibold">{review.userName}</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i < review.rating
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "fill-muted text-muted"
-                                }`}
-                              />
-                            ))}
+                {product.reviews && product.reviews.length > 0 ? (
+                  product.reviews.map((review: any, index: number) => (
+                    <div key={index} className="border rounded-lg p-6">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold">{review.userName}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < review.rating
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "fill-muted text-muted"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(review.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </span>
                         </div>
                       </div>
+                      <p className="text-muted-foreground">{review.comment}</p>
                     </div>
-                    <p className="text-muted-foreground">{review.comment}</p>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No reviews yet. Be the first to review this product!
                   </div>
-                ))}
+                )}
               </div>
             </TabsContent>
 

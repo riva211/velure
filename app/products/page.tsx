@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -17,10 +17,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Filter, Search, X } from "lucide-react";
-import { dummyProducts, categories as productCategories } from "@/lib/dummy-data";
+import { toast } from "sonner";
 
-const allProducts = dummyProducts;
-const categories = ["All", ...productCategories];
+const categories = ["All", "Rings", "Necklaces", "Earrings", "Bracelets", "Anklets", "Chains"];
 const priceRanges = [
   { label: "All Prices", min: 0, max: Infinity },
   { label: "Under $100", min: 0, max: 100 },
@@ -30,12 +29,38 @@ const priceRanges = [
 ];
 
 export default function ProductsPage() {
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPriceRange, setSelectedPriceRange] = useState(priceRanges[0]);
   const [sortBy, setSortBy] = useState("featured");
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Fetch products from API
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/products");
+      const data = await response.json();
+
+      if (response.ok) {
+        setAllProducts(data.products || []);
+      } else {
+        toast.error("Failed to load products");
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to load products");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredProducts = allProducts
     .filter((product) => {
@@ -221,7 +246,11 @@ export default function ProductsPage() {
 
             {/* Products Grid */}
             <div className="flex-1">
-              {filteredProducts.length > 0 ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+              ) : filteredProducts.length > 0 ? (
                 <>
                   <p className="text-sm text-muted-foreground mb-6">
                     Showing {filteredProducts.length} product
@@ -236,20 +265,24 @@ export default function ProductsPage() {
               ) : (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
-                    No products found matching your criteria
+                    {allProducts.length === 0
+                      ? "No products available. Add products from the admin panel."
+                      : "No products found matching your criteria"}
                   </p>
-                  <Button
-                    variant="outline"
-                    className="mt-4"
-                    onClick={() => {
-                      setSelectedCategory("All");
-                      setSelectedPriceRange(priceRanges[0]);
-                      setShowInStockOnly(false);
-                      setSearchQuery("");
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
+                  {allProducts.length > 0 && (
+                    <Button
+                      variant="outline"
+                      className="mt-4"
+                      onClick={() => {
+                        setSelectedCategory("All");
+                        setSelectedPriceRange(priceRanges[0]);
+                        setShowInStockOnly(false);
+                        setSearchQuery("");
+                      }}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

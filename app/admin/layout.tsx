@@ -12,6 +12,7 @@ import {
   Users,
   Settings,
   Menu,
+  Wrench,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -86,6 +87,16 @@ export default function AdminLayout({
             <Link href="/admin/customers">
               <Users className="mr-2 h-4 w-4" />
               Customers
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            asChild
+          >
+            <Link href="/admin/utilities">
+              <Wrench className="mr-2 h-4 w-4" />
+              Utilities
             </Link>
           </Button>
           <Button

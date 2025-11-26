@@ -4,15 +4,39 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ArrowRight, ShoppingBag, Shield, Truck, Zap, Award } from "lucide-react";
-import { dummyProducts } from "@/lib/dummy-data";
+import { connectDB } from "@/lib/mongodb";
+import { Product } from "@/lib/models/Product";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-// Get featured products
-const featuredProducts = dummyProducts.filter(p => p.featured);
+// Get featured products from database
+async function getFeaturedProducts() {
+  try {
+    await connectDB();
+    const products = await Product.find({ featured: true })
+      .sort({ createdAt: -1 })
+      .lean();
 
-export default function HomePage() {
+    // Convert MongoDB documents to plain objects with string IDs
+    return products.map((product) => ({
+      ...product,
+      _id: product._id.toString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching featured products:", error);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const [featuredProducts, session] = await Promise.all([
+    getFeaturedProducts(),
+    getServerSession(authOptions),
+  ]);
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
+    <div className="flex flex-col min-h-screen" suppressHydrationWarning>
+      <Navbar serverSession={session} />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background">

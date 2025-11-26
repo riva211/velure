@@ -17,12 +17,24 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
+import type { Session } from "next-auth";
 
-export function Navbar() {
-  const { data: session } = useSession();
+interface NavbarProps {
+  serverSession?: Session | null;
+}
+
+export function Navbar({ serverSession }: NavbarProps = {}) {
+  const { data: clientSession } = useSession();
+  const session = serverSession ?? clientSession;
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const [cartItemsCount, setCartItemsCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted flag to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch cart count
   useEffect(() => {
@@ -180,7 +192,7 @@ export function Navbar() {
             >
               <Link href="/cart">
                 <ShoppingCart className="h-5 w-5" />
-                {cartItemsCount > 0 && (
+                {mounted && cartItemsCount > 0 && (
                   <Badge
                     variant="destructive"
                     className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
@@ -328,7 +340,7 @@ export function Navbar() {
                       className="text-lg font-medium text-foreground hover:text-primary transition-colors flex items-center gap-2"
                     >
                       Cart
-                      {cartItemsCount > 0 && (
+                      {mounted && cartItemsCount > 0 && (
                         <Badge variant="secondary">{cartItemsCount}</Badge>
                       )}
                     </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -26,16 +26,38 @@ import {
 } from "@/components/ui/dialog";
 import { Search, Eye } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { dummyOrders } from "@/lib/dummy-data";
-
-// Use dummy orders
-const mockOrders = dummyOrders;
+import { toast } from "sonner";
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState<typeof mockOrders[0] | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
+  // Fetch orders from API
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/orders");
+      const data = await response.json();
+
+      if (response.ok) {
+        setOrders(data.orders || []);
+      } else {
+        toast.error("Failed to load orders");
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Failed to load orders");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -45,12 +67,32 @@ export default function AdminOrdersPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const updateOrderStatus = (orderId: string, newStatus: string) => {
-    setOrders(
-      orders.map((order) =>
-        order._id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update order status");
+      }
+
+      // Update local state
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+
+      toast.success("Order status updated successfully");
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast.error("Failed to update order status");
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -110,8 +152,19 @@ export default function AdminOrdersPage() {
           <CardTitle>All Orders ({filteredOrders.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {filteredOrders.map((order) => (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : filteredOrders.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              {orders.length === 0
+                ? "No orders yet. Orders will appear here when customers make purchases."
+                : "No orders found matching your search criteria"}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredOrders.map((order) => (
               <div
                 key={order._id}
                 className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-4 border rounded-lg gap-4"
@@ -171,8 +224,9 @@ export default function AdminOrdersPage() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

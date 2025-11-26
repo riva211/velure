@@ -9,7 +9,7 @@ export const categories = [
 
 export const dummyProducts = [
   {
-    _id: "1",
+    _id: "prod_001",
     name: "Premium Wireless Headphones",
     description: "Experience crystal-clear audio with our premium wireless headphones. Features active noise cancellation, 40-hour battery life, and comfortable over-ear design. Perfect for music lovers and professionals.",
     price: 299.99,
@@ -21,7 +21,7 @@ export const dummyProducts = [
     numReviews: 124,
   },
   {
-    _id: "2",
+    _id: "prod_002",
     name: "Smart Watch Series 5",
     description: "Stay connected and track your fitness goals with our latest smartwatch. Features heart rate monitoring, GPS, sleep tracking, and seamless smartphone integration.",
     price: 399.99,
@@ -33,7 +33,7 @@ export const dummyProducts = [
     numReviews: 89,
   },
   {
-    _id: "3",
+    _id: "prod_003",
     name: "Designer Leather Bag",
     description: "Handcrafted from genuine Italian leather, this elegant bag combines style and functionality. Multiple compartments keep you organized while making a fashion statement.",
     price: 199.99,
@@ -45,7 +45,7 @@ export const dummyProducts = [
     numReviews: 56,
   },
   {
-    _id: "4",
+    _id: "prod_004",
     name: "Modern Table Lamp",
     description: "Elegant minimalist design with adjustable brightness. LED technology provides warm, energy-efficient lighting perfect for any room.",
     price: 79.99,
@@ -57,7 +57,7 @@ export const dummyProducts = [
     numReviews: 32,
   },
   {
-    _id: "5",
+    _id: "prod_005",
     name: "Wireless Mechanical Keyboard",
     description: "Premium mechanical switches provide satisfying tactile feedback. Wireless connectivity, RGB backlighting, and ergonomic design for the ultimate typing experience.",
     price: 149.99,
@@ -69,7 +69,7 @@ export const dummyProducts = [
     numReviews: 67,
   },
   {
-    _id: "6",
+    _id: "prod_006",
     name: "Running Shoes Pro",
     description: "Lightweight, breathable, and designed for performance. Advanced cushioning technology reduces impact while maximizing energy return.",
     price: 129.99,
@@ -81,7 +81,7 @@ export const dummyProducts = [
     numReviews: 143,
   },
   {
-    _id: "7",
+    _id: "prod_007",
     name: "4K Ultra HD Camera",
     description: "Capture life's moments in stunning 4K resolution. Professional-grade features in a compact, user-friendly package. Includes 3 lenses and accessories.",
     price: 899.99,
@@ -93,7 +93,7 @@ export const dummyProducts = [
     numReviews: 92,
   },
   {
-    _id: "8",
+    _id: "prod_008",
     name: "Organic Cotton T-Shirt",
     description: "Soft, sustainable, and stylish. Made from 100% organic cotton with a perfect fit. Available in multiple colors.",
     price: 29.99,
@@ -105,7 +105,7 @@ export const dummyProducts = [
     numReviews: 28,
   },
   {
-    _id: "9",
+    _id: "prod_009",
     name: "Smart Coffee Maker",
     description: "Wake up to freshly brewed coffee every morning. Programmable, app-controlled, and designed to brew the perfect cup every time.",
     price: 179.99,
@@ -117,7 +117,7 @@ export const dummyProducts = [
     numReviews: 45,
   },
   {
-    _id: "10",
+    _id: "prod_010",
     name: "Yoga Mat Premium",
     description: "Extra-thick, non-slip surface provides superior comfort and stability. Eco-friendly materials, easy to clean, comes with carrying strap.",
     price: 49.99,
@@ -129,7 +129,7 @@ export const dummyProducts = [
     numReviews: 78,
   },
   {
-    _id: "11",
+    _id: "prod_011",
     name: "Wireless Earbuds Pro",
     description: "True wireless freedom with premium sound quality. Active noise cancellation, touch controls, and 24-hour battery life with charging case.",
     price: 199.99,
@@ -141,7 +141,7 @@ export const dummyProducts = [
     numReviews: 156,
   },
   {
-    _id: "12",
+    _id: "prod_012",
     name: "Minimalist Backpack",
     description: "Sleek design meets maximum functionality. Padded laptop compartment, water-resistant fabric, and ergonomic straps for all-day comfort.",
     price: 89.99,
@@ -153,7 +153,7 @@ export const dummyProducts = [
     numReviews: 41,
   },
   {
-    _id: "13",
+    _id: "prod_013",
     name: "Aromatherapy Diffuser",
     description: "Create a relaxing atmosphere with this elegant ultrasonic diffuser. LED color-changing lights, whisper-quiet operation, auto shut-off.",
     price: 39.99,
@@ -165,7 +165,7 @@ export const dummyProducts = [
     numReviews: 63,
   },
   {
-    _id: "14",
+    _id: "prod_014",
     name: "Fitness Tracker Band",
     description: "Monitor your health 24/7. Track steps, heart rate, sleep quality, and more. Water-resistant with 7-day battery life.",
     price: 79.99,
@@ -177,7 +177,7 @@ export const dummyProducts = [
     numReviews: 87,
   },
   {
-    _id: "15",
+    _id: "prod_015",
     name: "Luxury Skincare Set",
     description: "Complete daily skincare routine in one premium package. Includes cleanser, toner, serum, and moisturizer. Dermatologist-tested, suitable for all skin types.",
     price: 129.99,
@@ -189,7 +189,7 @@ export const dummyProducts = [
     numReviews: 94,
   },
   {
-    _id: "16",
+    _id: "prod_016",
     name: "Bestseller Book Collection",
     description: "Curated collection of 5 must-read contemporary novels. Perfect gift for book lovers or start your reading journey.",
     price: 59.99,
@@ -204,28 +204,24 @@ export const dummyProducts = [
 
 export const dummyReviews = [
   {
-    _id: "1",
     userName: "John Smith",
     rating: 5,
     comment: "Absolutely amazing quality! Exceeded my expectations. The build quality is top-notch and it works flawlessly.",
     createdAt: new Date("2024-01-15"),
   },
   {
-    _id: "2",
     userName: "Sarah Johnson",
     rating: 4,
     comment: "Great product overall. Fast shipping and good customer service. Only minor issue was the packaging could be better.",
     createdAt: new Date("2024-01-10"),
   },
   {
-    _id: "3",
     userName: "Michael Chen",
     rating: 5,
     comment: "Best purchase I've made this year. The attention to detail is impressive. Highly recommend!",
     createdAt: new Date("2024-01-08"),
   },
   {
-    _id: "4",
     userName: "Emily Davis",
     rating: 4,
     comment: "Very satisfied with this purchase. Good value for money. Would definitely buy again.",
@@ -235,7 +231,7 @@ export const dummyReviews = [
 
 export const dummyOrders = [
   {
-    _id: "1",
+    _id: "order_001",
     orderId: "ORD-2024-001",
     customer: { name: "John Doe", email: "john@example.com" },
     items: [
@@ -247,7 +243,7 @@ export const dummyOrders = [
     createdAt: new Date("2024-01-15"),
   },
   {
-    _id: "2",
+    _id: "order_002",
     orderId: "ORD-2024-002",
     customer: { name: "Jane Smith", email: "jane@example.com" },
     items: [
@@ -258,7 +254,7 @@ export const dummyOrders = [
     createdAt: new Date("2024-01-15"),
   },
   {
-    _id: "3",
+    _id: "order_003",
     orderId: "ORD-2024-003",
     customer: { name: "Bob Johnson", email: "bob@example.com" },
     items: [
@@ -270,7 +266,7 @@ export const dummyOrders = [
     createdAt: new Date("2024-01-14"),
   },
   {
-    _id: "4",
+    _id: "order_004",
     orderId: "ORD-2024-004",
     customer: { name: "Alice Williams", email: "alice@example.com" },
     items: [
@@ -281,7 +277,7 @@ export const dummyOrders = [
     createdAt: new Date("2024-01-13"),
   },
   {
-    _id: "5",
+    _id: "order_005",
     orderId: "ORD-2024-005",
     customer: { name: "David Brown", email: "david@example.com" },
     items: [

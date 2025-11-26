@@ -14,6 +14,7 @@ export interface IProduct {
   description: string;
   price: number;
   category: string;
+  metal?: string;
   images: string[];
   stock: number;
   featured: boolean;
@@ -69,6 +70,9 @@ const ProductSchema = new Schema<IProduct>(
     category: {
       type: String,
       required: [true, "Please provide a product category"],
+    },
+    metal: {
+      type: String,
     },
     images: {
       type: [String],

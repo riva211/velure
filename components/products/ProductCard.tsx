@@ -61,7 +61,27 @@ export function ProductCard({ product }: ProductCardProps) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        let error;
+        try {
+          error = await response.json();
+        } catch (parseError) {
+          console.error("Failed to parse error response:", parseError);
+          error = { error: "Server error - invalid response format" };
+        }
+
+        console.error("Server error:", error);
+
+        // Show specific error message
+        if (error.error === "Product not found") {
+          toast.error("Product not found in database", {
+            description: "Please seed the database first. Visit /seed-database"
+          });
+        } else if (error.error === "Unauthorized") {
+          toast.error("Please login to continue");
+          router.push("/login");
+        } else {
+          toast.error(error.error || "Failed to add to cart");
+        }
         throw new Error(error.error || "Failed to add to cart");
       }
 

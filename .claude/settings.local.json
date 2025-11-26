@@ -16,7 +16,9 @@
       "Bash(cmd /c:*)",
       "Bash(dir node_modules@radix-ui)",
       "Bash(cat:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(nul)",
+      "Bash(del \".next\\dev\\lock\" 2)"
     ],
     "deny": [],
     "ask": []

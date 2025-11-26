@@ -51,7 +51,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { productId, quantity = 1 } = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      console.error("Invalid JSON in request body:", error);
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 }
+      );
+    }
+
+    const { productId, quantity = 1 } = body;
 
     if (!productId) {
       return NextResponse.json(
@@ -119,13 +130,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Mark items as modified for Mongoose
+    cart.markModified('items');
     await cart.save();
 
     return NextResponse.json({ cart, message: "Item added to cart" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error adding to cart:", error);
+
+    // Return more detailed error information
+    const errorMessage = error.message || "Failed to add item to cart";
     return NextResponse.json(
-      { error: "Failed to add item to cart" },
+      {
+        error: errorMessage,
+        details: process.env.NODE_ENV === "development" ? error.toString() : undefined
+      },
       { status: 500 }
     );
   }
@@ -202,9 +221,24 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE - Remove item from cart
+// DELETE - Remove item from cart or delete all carts
 export async function DELETE(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const productId = searchParams.get("productId");
+    const deleteAll = searchParams.get("deleteAll");
+
+    // Delete all carts (for admin database cleanup)
+    if (deleteAll === "true") {
+      await connectDB();
+      const result = await Cart.deleteMany({});
+      return NextResponse.json({
+        message: `Successfully deleted ${result.deletedCount} carts`,
+        deletedCount: result.deletedCount,
+      });
+    }
+
+    // Remove individual item from user's cart
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
@@ -213,9 +247,6 @@ export async function DELETE(req: NextRequest) {
         { status: 401 }
       );
     }
-
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("productId");
 
     if (!productId) {
       return NextResponse.json(
@@ -243,9 +274,9 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ cart, message: "Item removed from cart" });
   } catch (error) {
-    console.error("Error removing from cart:", error);
+    console.error("Error in cart DELETE:", error);
     return NextResponse.json(
-      { error: "Failed to remove item from cart" },
+      { error: "Failed to process request" },
       { status: 500 }
     );
   }
