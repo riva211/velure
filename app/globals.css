@@ -73,54 +73,60 @@
   --color-card-foreground: 222.2 84% 4.9%;
   --color-popover: 0 0% 100%;
   --color-popover-foreground: 222.2 84% 4.9%;
-  --color-primary: 222.2 47.4% 11.2%;
-  --color-primary-foreground: 210 40% 98%;
-  --color-secondary: 210 40% 96.1%;
-  --color-secondary-foreground: 222.2 47.4% 11.2%;
-  --color-muted: 210 40% 96.1%;
-  --color-muted-foreground: 215.4 16.3% 46.9%;
-  --color-accent: 210 40% 96.1%;
-  --color-accent-foreground: 222.2 47.4% 11.2%;
-  --color-destructive: 0 84.2% 60.2%;
-  --color-destructive-foreground: 210 40% 98%;
-  --color-border: 214.3 31.8% 91.4%;
-  --color-input: 214.3 31.8% 91.4%;
-  --color-ring: 222.2 84% 4.9%;
+  /* Warm, vibrant brand primary (sunset orange) */
+  --color-primary: 20 78% 48%;
+  --color-primary-foreground: 0 0% 100%;
+  /* Soft warm secondary background (parchment/khaki tint) */
+  --color-secondary: 30 40% 92%;
+  --color-secondary-foreground: 24 62% 26%;
+  /* Muted and accent shifted warmer */
+  --color-muted: 30 32% 94%;
+  --color-muted-foreground: 25 20% 45%;
+  --color-accent: 20 55% 96%;
+  --color-accent-foreground: 20 70% 35%;
+  --color-destructive: 0 72% 45%;
+  --color-destructive-foreground: 0 0% 100%;
+  --color-border: 28 30% 90%;
+  --color-input: 28 30% 90%;
+  --color-ring: 20 78% 48%;
   --radius: 0.5rem;
 
-  --chart-1: 12 76% 61%;
+  /* Charts tuned to warmer scheme */
+  --chart-1: 16 85% 54%;
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
+  --chart-4: 43 84% 55%;
+  --chart-5: 27 87% 57%;
 }
 
 /* Dark mode overrides */
 .dark {
-  --color-background: 222.2 84% 4.9%;
-  --color-foreground: 210 40% 98%;
-  --color-card: 222.2 84% 4.9%;
-  --color-card-foreground: 210 40% 98%;
-  --color-popover: 222.2 84% 4.9%;
-  --color-popover-foreground: 210 40% 98%;
-  --color-primary: 210 40% 98%;
-  --color-primary-foreground: 222.2 47.4% 11.2%;
-  --color-secondary: 217.2 32.6% 17.5%;
-  --color-secondary-foreground: 210 40% 98%;
-  --color-muted: 217.2 32.6% 17.5%;
-  --color-muted-foreground: 215 20.2% 65.1%;
-  --color-accent: 217.2 32.6% 17.5%;
-  --color-accent-foreground: 210 40% 98%;
-  --color-destructive: 0 62.8% 30.6%;
-  --color-destructive-foreground: 210 40% 98%;
-  --color-border: 217.2 32.6% 17.5%;
-  --color-input: 217.2 32.6% 17.5%;
-  --color-ring: 212.7 26.8% 83.9%;
-  --chart-1: 220 70% 50%;
+  --color-background: 222.2 60% 6%;
+  --color-foreground: 30 20% 96%;
+  --color-card: 222.2 50% 7.5%;
+  --color-card-foreground: 30 20% 96%;
+  --color-popover: 222.2 50% 7.5%;
+  --color-popover-foreground: 30 20% 96%;
+  /* Warm brand in dark mode (brighter orange) */
+  --color-primary: 20 85% 60%;
+  --color-primary-foreground: 0 0% 100%;
+  /* Warm neutrals for surfaces */
+  --color-secondary: 28 18% 18%;
+  --color-secondary-foreground: 30 20% 92%;
+  --color-muted: 28 16% 16%;
+  --color-muted-foreground: 28 15% 70%;
+  --color-accent: 24 20% 20%;
+  --color-accent-foreground: 24 30% 90%;
+  --color-destructive: 0 70% 45%;
+  --color-destructive-foreground: 0 0% 100%;
+  --color-border: 28 18% 20%;
+  --color-input: 28 18% 20%;
+  --color-ring: 20 85% 60%;
+  --chart-1: 16 85% 60%;
   --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
+  --chart-3: 30 80% 60%;
+  --chart-4: 280 65% 65%;
+  --chart-5: 340 75% 60%;
 }
 
 @layer base {

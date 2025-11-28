@@ -39,7 +39,7 @@ export default async function HomePage() {
       <Navbar serverSession={session} />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+        <section className="relative bg-linear-to-br from-seashell-200 via-parchment-100 to-background">
           <div className="container mx-auto px-4 py-24 md:py-32">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
@@ -65,12 +65,12 @@ export default async function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 bg-muted/50">
+        <section className="py-16 bg-secondary">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center p-6">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Truck className="h-6 w-6 text-primary" />
+                  <Truck className="h-6 w-6 text-seashell-700" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Free Shipping</h3>
                 <p className="text-muted-foreground">
@@ -79,7 +79,7 @@ export default async function HomePage() {
               </div>
               <div className="flex flex-col items-center text-center p-6">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Shield className="h-6 w-6 text-primary" />
+                  <Shield className="h-6 w-6 text-seashell-700" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Secure Payment</h3>
                 <p className="text-muted-foreground">
@@ -88,7 +88,7 @@ export default async function HomePage() {
               </div>
               <div className="flex flex-col items-center text-center p-6">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <ShoppingBag className="h-6 w-6 text-primary" />
+                  <ShoppingBag className="h-6 w-6 text-seashell-700" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Easy Returns</h3>
                 <p className="text-muted-foreground">

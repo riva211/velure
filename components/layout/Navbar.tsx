@@ -144,10 +144,10 @@ export function Navbar({ serverSession }: NavbarProps = {}) {
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="bg-primary rounded-lg p-1.5">
-              <Store className="h-5 w-5 text-primary-foreground" />
+            <div className="bg-seashell-500 rounded-lg p-1.5">
+              <Store className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-seashell-600 to-parchment-500 bg-clip-text text-transparent">
               Velure
             </span>
           </Link>
