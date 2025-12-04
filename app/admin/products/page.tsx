@@ -246,8 +246,25 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter((p) => p._id !== id));
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      const response = await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete product");
+      }
+
+      toast.success("Product deleted successfully!");
+
+      // Remove product from local state
+      setProducts(products.filter((p) => p._id !== id));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to delete product");
+    }
   };
 
   return (
