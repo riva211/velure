@@ -14,6 +14,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
+import { useMarket } from "@/components/market-provider";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,7 +23,8 @@ interface ProductCardProps {
     _id: string;
     name: string;
     description: string;
-    price: number;
+    priceINR: number;
+    priceUSD: number;
     category: string;
     images: string[];
     stock: number;
@@ -33,6 +35,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { data: session } = useSession();
+  const { market, currencySymbol } = useMarket();
   const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -57,6 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
         body: JSON.stringify({
           productId: product._id,
           quantity: 1,
+          market,
         }),
       });
 
@@ -175,7 +179,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
         <CardFooter className="p-4 pt-0 flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold">{formatPrice(product.price)}</p>
+            <p className="text-2xl font-bold">{currencySymbol}{" "}{market === "IN" ? product.priceINR?.toFixed(2) : product.priceUSD?.toFixed(2)}</p>
           </div>
           <Button
             size="sm"

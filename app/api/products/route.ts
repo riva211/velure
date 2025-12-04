@@ -10,7 +10,8 @@ export async function POST(req: NextRequest) {
     const {
       name,
       productDetails,
-      price,
+      priceINR,
+      priceUSD,
       metal,
       category,
       stock,
@@ -18,10 +19,11 @@ export async function POST(req: NextRequest) {
       image2,
       image3,
       image4,
+      featured,
     } = body;
 
     // Validation
-    if (!name || !productDetails || !price || !metal || !category || !stock || !image1 || !image2 || !image3) {
+    if (!name || !productDetails || priceINR == null || priceUSD == null || !metal || !category || !stock || !image1 || !image2 || !image3) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -36,12 +38,13 @@ export async function POST(req: NextRequest) {
     const product = await Product.create({
       name,
       description: productDetails,
-      price: parseFloat(price),
+      priceINR: parseFloat(priceINR),
+      priceUSD: parseFloat(priceUSD),
       metal,
       category,
       stock: parseInt(stock),
       images,
-      featured: false,
+      featured: featured || false,
       averageRating: 0,
       numReviews: 0,
     });

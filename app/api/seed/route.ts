@@ -17,7 +17,8 @@ export async function POST() {
       dummyProducts.map((product) => ({
         name: product.name,
         description: product.description,
-        price: product.price,
+        priceINR: product.price,
+        priceUSD: product.price,
         category: product.category,
         images: product.images,
         stock: product.stock,

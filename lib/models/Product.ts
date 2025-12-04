@@ -12,7 +12,8 @@ export interface IProduct {
   _id: string;
   name: string;
   description: string;
-  price: number;
+  priceINR: number;
+  priceUSD: number;
   category: string;
   metal?: string;
   images: string[];
@@ -62,9 +63,14 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       required: [true, "Please provide a product description"],
     },
-    price: {
+    priceINR: {
       type: Number,
-      required: [true, "Please provide a product price"],
+      required: [true, "Please provide a product price in INR"],
+      min: 0,
+    },
+    priceUSD: {
+      type: Number,
+      required: [true, "Please provide a product price in USD"],
       min: 0,
     },
     category: {

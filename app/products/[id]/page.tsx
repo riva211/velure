@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatPrice } from "@/lib/utils";
+import { useMarket } from "@/components/market-provider";
 import {
   Heart,
   ShoppingCart,
@@ -36,6 +36,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const [product, setProduct] = useState<any>(null);
+  const { market, currencySymbol } = useMarket();
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -90,6 +91,7 @@ export default function ProductDetailPage() {
         body: JSON.stringify({
           productId: product._id,
           quantity: quantity,
+          market,
         }),
       });
 
@@ -208,7 +210,7 @@ export default function ProductDetailPage() {
                   </span>
                 </div>
                 <p className="text-3xl font-bold">
-                  {formatPrice(product.price)}
+                  {currencySymbol} {market === "IN" ? product.priceINR?.toFixed(2) : product.priceUSD?.toFixed(2)}
                 </p>
               </div>
 

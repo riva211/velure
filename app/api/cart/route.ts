@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { productId, quantity = 1 } = body;
+    const { productId, quantity = 1, market } = body;
 
     if (!productId) {
       return NextResponse.json(
@@ -120,10 +120,11 @@ export async function POST(req: NextRequest) {
       cart.items[existingItemIndex].quantity = newQuantity;
     } else {
       // Add new item to cart
+      const unitPrice = market === "IN" ? (product as any).priceINR : (product as any).priceUSD;
       cart.items.push({
         product: productId,
         name: product.name,
-        price: product.price,
+        price: unitPrice,
         quantity,
         image: product.images[0] || "/placeholder-product.jpg",
         stock: product.stock,

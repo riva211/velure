@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import type { Session } from "next-auth";
+import { useMarket } from "@/components/market-provider";
 
 interface NavbarProps {
   serverSession?: Session | null;
@@ -30,6 +31,7 @@ export function Navbar({ serverSession }: NavbarProps = {}) {
   const pathname = usePathname();
   const [cartItemsCount, setCartItemsCount] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const { market, setMarket } = useMarket();
 
   // Set mounted flag to avoid hydration mismatch
   useEffect(() => {
@@ -75,6 +77,20 @@ export function Navbar({ serverSession }: NavbarProps = {}) {
     if (path !== "/" && pathname?.startsWith(path)) return true;
     return false;
   };
+
+  const MarketSelector = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          {market === "IN" ? "India (INR)" : "Canada (USD)"}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setMarket("IN")}>India (INR)</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setMarket("CA")}>Canada (USD)</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   const NavLinks = () => (
     <>
@@ -171,6 +187,8 @@ export function Navbar({ serverSession }: NavbarProps = {}) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
+            {/* Market Selector */}
+            <MarketSelector />
             {/* Wishlist */}
             <Button
               variant="ghost"

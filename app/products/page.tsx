@@ -20,7 +20,9 @@ import { Filter, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 const categories = ["All", "Rings", "Necklaces", "Earrings", "Bracelets", "Anklets", "Chains"];
-const priceRanges = [
+import { useMarket } from "@/components/market-provider";
+
+const usdRanges = [
   { label: "All Prices", min: 0, max: Infinity },
   { label: "Under $100", min: 0, max: 100 },
   { label: "$100 - $200", min: 100, max: 200 },
@@ -28,15 +30,29 @@ const priceRanges = [
   { label: "Over $300", min: 300, max: Infinity },
 ];
 
+const inrRanges = [
+  { label: "All Prices", min: 0, max: Infinity },
+  { label: "Under ₹10,000", min: 0, max: 10000 },
+  { label: "₹10,000 - ₹50,000", min: 10000, max: 50000 },
+  { label: "₹50,000 - ₹100,000", min: 50000, max: 100000 },
+  { label: "Over ₹100,000", min: 100000, max: Infinity },
+];
+
 export default function ProductsPage() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedPriceRange, setSelectedPriceRange] = useState(priceRanges[0]);
+  const { market, currencySymbol } = useMarket();
+  const [selectedPriceRange, setSelectedPriceRange] = useState((market === "IN" ? inrRanges : usdRanges)[0]);
   const [sortBy, setSortBy] = useState("featured");
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Reset price ranges when market changes
+  useEffect(() => {
+    setSelectedPriceRange((market === "IN" ? inrRanges : usdRanges)[0]);
+  }, [market]);
 
   // Fetch products from API
   useEffect(() => {
@@ -70,9 +86,10 @@ export default function ProductsPage() {
       }
 
       // Price filter
+      const effectivePrice = market === "IN" ? product.priceINR : product.priceUSD;
       if (
-        product.price < selectedPriceRange.min ||
-        product.price > selectedPriceRange.max
+        effectivePrice < selectedPriceRange.min ||
+        effectivePrice > selectedPriceRange.max
       ) {
         return false;
       }
@@ -95,10 +112,16 @@ export default function ProductsPage() {
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
+        case "price-low": {
+          const ap = market === "IN" ? a.priceINR : a.priceUSD;
+          const bp = market === "IN" ? b.priceINR : b.priceUSD;
+          return ap - bp;
+        }
+        case "price-high": {
+          const ap = market === "IN" ? a.priceINR : a.priceUSD;
+          const bp = market === "IN" ? b.priceINR : b.priceUSD;
+          return bp - ap;
+        }
         case "rating":
           return b.averageRating - a.averageRating;
         case "newest":
