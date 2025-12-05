@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
 import { useMarket } from "@/components/market-provider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 interface ProductCardProps {
@@ -39,6 +39,40 @@ export function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
+
+  // Check if product is in wishlist
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (!session?.user) return;
+
+      try {
+        const response = await fetch("/api/wishlist");
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const isInWishlist = data.items?.some(
+          (item: any) => item.product === product._id
+        );
+        setIsWishlisted(isInWishlist);
+      } catch (error) {
+        console.error("Error checking wishlist status:", error);
+      }
+    };
+
+    checkWishlistStatus();
+
+    // Listen for wishlist updates
+    const handleWishlistUpdate = () => {
+      checkWishlistStatus();
+    };
+
+    window.addEventListener("wishlistUpdated", handleWishlistUpdate);
+
+    return () => {
+      window.removeEventListener("wishlistUpdated", handleWishlistUpdate);
+    };
+  }, [session, product._id]);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -101,11 +135,61 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  const handleToggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsWishlisted(!isWishlisted);
-    // TODO: Implement wishlist functionality
-    console.log("Toggle wishlist:", product._id);
+
+    // Check if user is authenticated
+    if (!session?.user) {
+      toast.error("Please login to add items to wishlist");
+      router.push("/login");
+      return;
+    }
+
+    try {
+      setIsTogglingWishlist(true);
+
+      if (isWishlisted) {
+        // Remove from wishlist
+        const response = await fetch(`/api/wishlist?productId=${product._id}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to remove from wishlist");
+        }
+
+        setIsWishlisted(false);
+        toast.success("Removed from wishlist");
+      } else {
+        // Add to wishlist
+        const response = await fetch("/api/wishlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId: product._id,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to add to wishlist");
+        }
+
+        setIsWishlisted(true);
+        toast.success("Added to wishlist");
+      }
+
+      // Trigger wishlist update event
+      window.dispatchEvent(new Event("wishlistUpdated"));
+    } catch (error: any) {
+      console.error("Error toggling wishlist:", error);
+      toast.error(error.message || "Failed to update wishlist");
+    } finally {
+      setIsTogglingWishlist(false);
+    }
   };
 
   return (
@@ -128,6 +212,7 @@ export function ProductCard({ product }: ProductCardProps) {
               isWishlisted ? "text-red-500" : ""
             }`}
             onClick={handleToggleWishlist}
+            disabled={isTogglingWishlist}
           >
             <Heart
               className="h-4 w-4"

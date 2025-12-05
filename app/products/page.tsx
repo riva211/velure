@@ -155,7 +155,7 @@ export default function ProductsPage() {
       <div>
         <h3 className="text-lg font-semibold mb-4">Price Range</h3>
         <div className="space-y-2">
-          {priceRanges.map((range) => (
+          {(market === "IN" ? inrRanges : usdRanges).map((range) => (
             <button
               key={range.label}
               onClick={() => setSelectedPriceRange(range)}
@@ -190,7 +190,7 @@ export default function ProductsPage() {
         className="w-full"
         onClick={() => {
           setSelectedCategory("All");
-          setSelectedPriceRange(priceRanges[0]);
+          setSelectedPriceRange((market === "IN" ? inrRanges : usdRanges)[0]);
           setShowInStockOnly(false);
           setSearchQuery("");
         }}
@@ -298,7 +298,7 @@ export default function ProductsPage() {
                       className="mt-4"
                       onClick={() => {
                         setSelectedCategory("All");
-                        setSelectedPriceRange(priceRanges[0]);
+                        setSelectedPriceRange((market === "IN" ? inrRanges : usdRanges)[0]);
                         setShowInStockOnly(false);
                         setSearchQuery("");
                       }}

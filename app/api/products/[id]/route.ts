@@ -122,8 +122,7 @@ export async function PATCH(
       );
     }
 
-    const transformed = { ...updated, _id: (updated._id as mongoose.Types.ObjectId).toString() };
-    return NextResponse.json({ message: "Product updated successfully", product: transformed });
+    return NextResponse.json({ message: "Product updated successfully", product: updated });
   } catch (error) {
     console.error("Error updating product:", error);
     return NextResponse.json(
